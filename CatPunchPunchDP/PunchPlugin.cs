@@ -34,6 +34,7 @@ public class PunchPlugin : BaseUnityPlugin
         PunchHUDHooks.HookOn();
         DeerHooks.HookOn();
 
+        //thanks pukuyo
         try
         {
             string path = AssetManager.ResolveFilePath("punchbundle/punchbundle");
