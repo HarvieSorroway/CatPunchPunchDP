@@ -60,8 +60,8 @@ namespace CatPunchPunchDP.Modules
             if (creaturePackage == null)
             {
                 creaturePackage = (from physicalObject in player.room.physicalObjects[player.collisionLayer]
-                         where physicalObject is Creature && physicalObject != player && (ignoreDead ? !(physicalObject as Creature).dead : true)
-                         select physicalObject as Creature);
+                         where physicalObject is Creature && physicalObject != player && (ignoreDead ? !(physicalObject as Creature).dead : true) && (PunchConfig.IgnoreSlugs() ? !(physicalObject is Player) : true)
+                                   select physicalObject as Creature);
             }
 
             foreach (var creature in creaturePackage)
@@ -109,7 +109,6 @@ namespace CatPunchPunchDP.Modules
                 targetPackage.punchVec = (targetPackage.targetChunck.pos - player.DangerPos);
             }
     
-
             return targetPackage;
         }
 
@@ -164,6 +163,16 @@ namespace CatPunchPunchDP.Modules
                 return new BlackHolePunch();
             else if (punchType == PunchType.PuffPunch)
                 return new PuffPunch();
+
+            foreach(var ex in PunchExtender.extends)
+            {
+                if (ex.punchType != punchType)
+                    continue;
+                var punch = ex.GetPunchFunc();
+                if (punch != null)
+                    return punch;
+            }
+
             return new NormalPunch();
         }
 
@@ -241,6 +250,12 @@ namespace CatPunchPunchDP.Modules
                 AbstractCreature abstractCreature = obj as AbstractCreature;
                 if (abstractCreature.creatureTemplate.type == CreatureTemplate.Type.VultureGrub)
                     return LaserPunch;
+            }
+
+            foreach(var ex in PunchExtender.extends)
+            {
+                if (ex.ParseObjectType(obj))
+                    return ex.punchType;
             }
 
             return NormalPunch;

@@ -1,4 +1,5 @@
-﻿using CatPunchPunchDP.Modules;
+﻿using CatPunchPunchDP;
+using CatPunchPunchDP.Modules;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
@@ -17,6 +18,7 @@ public class PunchConfig : OptionInterface
 {
     static bool inited;
 
+    public static Configurable<bool> ignoreSlugs;
     public static Dictionary<PunchType, ConfigSetting> configSettings = new Dictionary<PunchType, ConfigSetting>();
     static Dictionary<PunchType, Configurable<int>> coolDownConfigs = new Dictionary<PunchType, Configurable<int>>();
 
@@ -28,6 +30,7 @@ public class PunchConfig : OptionInterface
 
     public PunchConfig()
     {
+        ignoreSlugs = config.Bind<bool>("CatPunchPunch_IgnoreFriends", true);
         if (!inited)
         {
             inited = true;
@@ -46,16 +49,24 @@ public class PunchConfig : OptionInterface
     public static Configurable<int> GetIntValConfig(PunchType punchType) => intValConfigs[punchType];
     public static Configurable<string> GetStringConfig(PunchType punchType) => stringValConfig[punchType];
 
+    public static bool IgnoreSlugs()
+    {
+        return ignoreSlugs.Value;
+    }
+
     public override void Initialize()
     {
         base.Initialize();
+
         infoBoxes.Clear();
 
         Tabs = new OpTab[1];
         Tabs[0] = new OpTab(this, "Main");
         OpLabel title = new OpLabel(new Vector2(300 - 100, 550), new Vector2(200, 30), "CatPunchPunch", FLabelAlignment.Center, true) { color = MenuColorEffect.rgbWhite};
+        OpCheckBox ignoreSlugsCheck = new OpCheckBox(ignoreSlugs, new Vector2(50, 510f));
+        OpLabel ignoreSlugsLabel = new OpLabel(80, 510f, "Ignore other slugcats");
         OpScrollBox opScrollBox = new OpScrollBox(new Vector2(50, 50), new Vector2(500, 450), (ExtEnum<PunchType>.values.entries.Count + 1) * 125f + 100f);
-        Tabs[0].AddItems(opScrollBox,title);
+        Tabs[0].AddItems(opScrollBox, title, ignoreSlugsCheck, ignoreSlugsLabel);
 
         int index = 0;
         foreach (var punch in ExtEnum<PunchType>.values.entries)
@@ -254,6 +265,16 @@ public class PunchConfig : OptionInterface
                 intValHigh = 70,
             };
         else
+        {
+            foreach (var ex in PunchExtender.extends)
+            {
+                if (ex.punchType != punchType)
+                    continue;
+                var setting = ex.GetConfigSetting();
+                if (setting != null)
+                    return setting;
+            }
+
             return new ConfigSetting()
             {
                 elementName = "",
@@ -268,6 +289,7 @@ public class PunchConfig : OptionInterface
                 floatValHigh = 2f,
                 floatValLow = 0.05f
             };
+        }
     }
 
 

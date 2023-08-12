@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using static CatPunchPunchDP.Modules.PunchFunc;
 
 public class LaserEmitter : CosmeticSprite, SharedPhysics.IProjectileTracer
@@ -117,7 +118,7 @@ public class LaserEmitter : CosmeticSprite, SharedPhysics.IProjectileTracer
         {
             List<Creature> tempList = new List<Creature>();
             foreach (var creature in (from physicalObject in player.room.physicalObjects[player.collisionLayer]
-                                      where physicalObject is Creature && physicalObject != player && !(damagedCreatures.Contains(physicalObject as Creature))
+                                      where physicalObject is Creature && physicalObject != player && !(damagedCreatures.Contains(physicalObject as Creature)) && (PunchConfig.IgnoreSlugs() ? !(physicalObject is Player) : true)
                                       select physicalObject as Creature))
             {
                 float maxAppendageDist = float.MaxValue;
@@ -274,7 +275,7 @@ public class LaserEmitter : CosmeticSprite, SharedPhysics.IProjectileTracer
 
     public bool HitThisObject(PhysicalObject obj)
     {
-        return (obj is Creature) && burnDamage && obj != player;
+        return (obj is Creature) && burnDamage && obj != player && (PunchConfig.IgnoreSlugs() ? !(obj is Player) : true);
     }
 
     public bool HitThisChunk(BodyChunk chunk)

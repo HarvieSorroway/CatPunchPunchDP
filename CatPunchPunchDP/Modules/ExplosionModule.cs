@@ -138,7 +138,7 @@ namespace CatPunchPunchDP.Modules
                         }
                         if (num4 > -1)
                         {
-                            if (explosion.room.physicalObjects[j][k] is Creature && explosion.room.physicalObjects[j][k] != Player)
+                            if (explosion.room.physicalObjects[j][k] is Creature && explosion.room.physicalObjects[j][k] != Player && (PunchConfig.IgnoreSlugs() ? !(explosion.room.physicalObjects[j][k] is Player) : true))
                             {
                                 int num7 = 0;
                                 while ((float)num7 < Math.Min(Mathf.Round(num2 * explosion.damage * 2f), 8f))

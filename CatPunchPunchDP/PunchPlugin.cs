@@ -1,7 +1,9 @@
 ﻿using BepInEx;
+using CatPunchPunchDP;
 using CatPunchPunchDP.Modules;
 using Menu.Remix.MixedUI.ValueTypes;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Permissions;
@@ -16,15 +18,31 @@ using UnityEngine;
 public class PunchPlugin : BaseUnityPlugin
 {
     public const string ModID = "harvie.catpunchpunch";
+    bool inited;
+    bool postInited;
 
     void OnEnable()
     {
         On.RainWorld.OnModsInit += RainWorld_OnModsInit;
+        On.RainWorld.PostModsInit += RainWorld_PostModsInit;
+    }
+
+    private void RainWorld_PostModsInit(On.RainWorld.orig_PostModsInit orig, RainWorld self)
+    {
+        orig.Invoke(self);
+        if (postInited)
+            return;
+        postInited = true;
+        StartCoroutine(VeryLateRegisterOI());
     }
 
     private void RainWorld_OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld self)
     {
         orig.Invoke(self);
+
+        if (inited)
+            return;
+
         PunchType.Init();
 
         ExplosionAndBombModuleManager.HookOn();
@@ -33,6 +51,7 @@ public class PunchPlugin : BaseUnityPlugin
         BeeModuleManager.HookOn();
         PunchHUDHooks.HookOn();
         DeerHooks.HookOn();
+
 
         //thanks pukuyo
         try
@@ -48,14 +67,7 @@ public class PunchPlugin : BaseUnityPlugin
             Debug.LogException(ex);
         }
 
-        try
-        {
-            MachineConnector.SetRegisteredOI(ModID, new PunchConfig());
-        }
-        catch(Exception e)
-        {
-            Debug.LogException(e);
-        }
+        inited = true;
     }
 
     public static void Log(object obj)
@@ -71,5 +83,18 @@ public class PunchPlugin : BaseUnityPlugin
     public static void Log(string pattern, params object[] vars)
     {
         Debug.Log($"[CatPunchPunch]" + string.Format(pattern, vars));
+    }
+
+    IEnumerator VeryLateRegisterOI()
+    {
+        yield return new WaitForSeconds(5);
+        try
+        {
+            MachineConnector.SetRegisteredOI(ModID, new PunchConfig());
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 }

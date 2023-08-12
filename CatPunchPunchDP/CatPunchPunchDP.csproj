@@ -74,6 +74,7 @@
     <Compile Include="Modules\PlayerModule.cs" />
     <Compile Include="Modules\PunchFunc.cs" />
     <Compile Include="PunchConfig.cs" />
+    <Compile Include="PunchExtend.cs" />
     <Compile Include="PunchPlugin.cs" />
     <Compile Include="SpecialEffects\BlackHole.cs" />
     <Compile Include="SpecialEffects\FriendlyPunchEffect.cs" />

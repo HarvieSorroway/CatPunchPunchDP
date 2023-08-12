@@ -231,8 +231,8 @@ namespace CatPunchPunchDP.Modules
             }
 
             var creatureInRoom = (from update in bee.room.updateList
-                                     where update is Creature && !(update as Creature).dead && (update as Creature).abstractCreature.ID.number != playerID.number
-                                     select update as Creature).ToArray();
+                                     where update is Creature && !(update as Creature).dead && (update as Creature).abstractCreature.ID.number != playerID.number && (PunchConfig.IgnoreSlugs() ? !(update is Player) : true)
+                                  select update as Creature).ToArray();
 
             if (creatureInRoom.Length > 0)
             {
