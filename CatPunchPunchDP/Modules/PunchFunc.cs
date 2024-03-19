@@ -272,7 +272,6 @@ namespace CatPunchPunchDP.Modules
 
     public class FastPunch : PunchFunc
     {
-        public override int coolDown => 5;
         public FastPunch() : base(PunchType.FastPunch)
         {
         }
@@ -357,7 +356,11 @@ namespace CatPunchPunchDP.Modules
 
     public class FriendlyPunch : PunchFunc
     {
-        public override int coolDown => 80;
+        public int PropertyA => 12;
+        public int PropertyB
+        {
+            get => 12;
+        }
 
         public FriendlyPunch(PunchType punchType) : base(punchType)
         {
@@ -413,7 +416,6 @@ namespace CatPunchPunchDP.Modules
 
     public class FriendlyPunch_HighLevel : FriendlyPunch
     {
-        public override int coolDown => 100;
         public FriendlyPunch_HighLevel() : base(PunchType.FriendlyPunch_HighLevel)
         {
         }
@@ -462,8 +464,6 @@ namespace CatPunchPunchDP.Modules
 
     public class NeedlePunch : PunchFunc
     {
-        public override int coolDown => 120;
-
         public NeedlePunch() : base(PunchType.NeedlePunch)
         {
         }
